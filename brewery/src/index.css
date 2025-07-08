@@ -85,3 +85,21 @@ button:focus-visible {
   max-width: 90%;
   backdrop-filter: blur(2px);
 }
+
+.summary {
+  display: flex;
+  justify-content: space-around;  
+  gap: 1rem;                      
+  margin: 2rem 0;
+  padding: 1rem;
+}
+
+.summary-box {
+  flex: 1;
+  background-color: goldenrod;;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}

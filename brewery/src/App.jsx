@@ -6,7 +6,13 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");
   const [filteredBreweries, setFilteredBreweries] = useState([]);
+  const [selectedState, setSelectedState] = useState("All");
 
+  const typeCounts = filteredBreweries.reduce((acc, b) => {
+    const type = b.brewery_type;
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
   useEffect(() => {
     async function fetchData() {
       try {
@@ -25,22 +31,28 @@ function App() {
 
   useEffect(() => {
     let result = breweries;
+
     if (searchQuery) {
       result = result.filter((b) =>
         b.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     if (filterType !== "All") {
       result = result.filter((b) => b.brewery_type === filterType);
     }
+
+    if (selectedState !== "All") {
+      result = result.filter((b) => b.state === selectedState);
+    }
+
     setFilteredBreweries(result);
-  }, [searchQuery, filterType, breweries]);
+  }, [searchQuery, filterType, selectedState, breweries]);
 
   // Summary statistics
   const totalBreweries = filteredBreweries.length;
-  const averageNameLength =
-    filteredBreweries.reduce((sum, b) => sum + b.name.length, 0) /
-    (filteredBreweries.length || 1);
+  const mostCommonType =
+    Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
   const cityCounts = filteredBreweries.reduce((acc, b) => {
     acc[b.city] = (acc[b.city] || 0) + 1;
@@ -71,12 +83,34 @@ function App() {
           <option value="brewpub">Brewpub</option>
           <option value="contract">Contract</option>
         </select>
+        <select
+          value={selectedState}
+          onChange={(e) => setSelectedState(e.target.value)}
+        >
+          <option value="All">All States</option>
+          <option value="California">California</option>
+          <option value="Texas">Texas</option>
+          <option value="New York">New York</option>
+          <option value="Colorado">Colorado</option>
+          <option value="Oregon">Oregon</option>
+          <option value="Washington">Washington</option>
+          <option value="Idaho">Idaho</option>
+        </select>
       </div>
 
       <div className="summary">
-        <h3>Total Breweries: {totalBreweries}</h3>
-        <h3>Average Name Length: {averageNameLength.toFixed(2)}</h3>
-        <h3>Most Common City: {mostCommonCity}</h3>
+        <div className="summary-box">
+          <h3>Total Breweries</h3>
+          <p>{totalBreweries}</p>
+        </div>
+        <div className="summary-box">
+          <h3>Most Common Type</h3>
+          <p>{mostCommonType}</p>
+        </div>
+        <div className="summary-box">
+          <h3>Most Common City</h3>
+          <p>{mostCommonCity}</p>
+        </div>
       </div>
 
       <table className="table">
